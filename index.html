@@ -1,43 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NASA API Pictures</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="https://s2.googleusercontent.com/s2/favicons?domain=www.nasa.gov">
-    <!-- ZTM Favicon -->
-    <!-- <link rel="icon" type="image/png" href="favicon.png"> -->
-</head>
-<body>
+    <link rel="stylesheet" href="index.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://s2.googleusercontent.com/s2/favicons?domain=www.nasa.gov"
+    />
+    <link rel="stylesheet" href="https://use.typekit.net/hqr7nth.css" />
+  </head>
+
+  <body>
     <!-- Loader -->
     <div class="loader hidden">
-        <img src="rocket.svg" alt="Rocket Loading Animation">
+      <img src="rocket.svg" alt="Rocket Loading Animation" />
     </div>
     <!-- Container -->
     <div class="container">
-        <!-- Navigation -->
-        <div class="navigation-container">
-            <span class="background"></span>
-            <!-- Results Nav -->
-            <span class="navigation-items" id="resultsNav">
-                <h3 class="clickable" id="favorites" onclick="updateDOM('favorites')">Favorites</h3>
-                <h3>&nbsp;&nbsp;&nbsp;○&nbsp;&nbsp;&nbsp;</h3>
-                <h3 class="clickable" id="load" onclick="getNasaPictures()">Load More</h3>
-            </span>
-            <!-- Favorites Nav -->
-            <span class="navigation-items hidden" id="favoritesNav">
-                <h3 class="clickable" onclick="getNasaPictures()">Load More NASA Images</h3>
-            </span>
+      <!-- Navigation -->
+      <div class="navigation-container">
+        <span class="background"></span>
+        <a href="#" class="blog-icon"
+          ><div class="moon-logo">
+            <div class="moon"></div>
+            <div class="shadow"></div></div
+        ></a>
+        <ul class="navigation-menu" id="resultsNav">
+          <li class="navigation-item">
+            <h3
+              class="clickable navigation-link"
+              id="favorites"
+              onclick="updateDOM('favorites')"
+            >
+              Favorites
+            </h3>
+          </li>
+          <li class="navigation-item">
+            <h3
+              class="clickable navigation-link"
+              id="load"
+              onclick="getNasaPictures()"
+            >
+              Load More
+            </h3>
+          </li>
+          <li class="navigation-item" hidden id="favoritesNav">
+            <h3 class="clickable navigation-link" onclick="getNasaPictures()">
+              Load More NASA Images
+            </h3>
+          </li>
+        </ul>
+        <!-- Menu Icon -->
+        <div class="menu-icon">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
         </div>
-        <!-- Images Container -->
-        <div class="images-container"></div>
+      </div>
+      <!-- Page title -->
+      <div class="header-container">
+        <h1>The Space Blog</h1>
+        <h2>A space of inspiration</h2>
+      </div>
+      <div class="block-three-container">
+        <div class="spacer"></div>
+        <div class="block-three-images-container"></div>
+        <div class="spacer"></div>
+      </div>
+      <!-- Images Container -->
+      <div class="images-container"></div>
     </div>
     <!-- Save Confirmation -->
     <div class="save-confirmed" hidden>
-        <h1>ADDED!</h1>
+      <h1>ADDED!</h1>
     </div>
     <!-- Script -->
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
