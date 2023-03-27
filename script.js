@@ -47,8 +47,22 @@ function imageLoadPromise(imgElement) {
       resolve();
     };
     imgElement.onerror = () => {
+      console.log("Failed image URL:", imgElement.src);
       reject(new Error("Image failed to load."));
     };
+  });
+}
+
+// Favorites Page
+function displayFavorites() {
+  if (localStorage.getItem("nasaFavorites")) {
+    favorites = JSON.parse(localStorage.getItem("nasaFavorites"));
+  }
+
+  imagesContainer.textContent = "";
+  const imagePromises = createDOMNodes("favorites");
+  Promise.all(imagePromises).then(() => {
+    showContent("favorites");
   });
 }
 
@@ -56,12 +70,15 @@ function createDOMNodes(page) {
   const imagePromises = [];
   // Load ResultsArray or Favorites
   const currentArray =
-    page === "results" ? resultsArray : Object.values(favorites);
+    page === "results"
+      ? resultsArray
+      : Object.values(favorites).filter((result) => favorites[result.url]);
 
-  const blockThreeContainer = document.querySelector(".block-three-container");
-  const imagesBlockContainer = document.querySelector(
-    ".block-three-images-container"
-  );
+  // First set of three
+  const blockThreeContainer = document.createElement("div");
+  blockThreeContainer.classList.add("block-three-container");
+  const imagesBlockContainer = document.createElement("div");
+  imagesBlockContainer.classList.add("block-three-images-container");
 
   // Creating divs
   const newBlockThreeContainer = document.createElement("div");
@@ -69,10 +86,19 @@ function createDOMNodes(page) {
   const newImagesBlockContainer = document.createElement("div");
   newImagesBlockContainer.classList.add("block-three-images-container");
 
-  const spacer1 = document.createElement("div");
-  const spacer2 = document.createElement("div");
-  spacer1.classList.add("spacer");
-  spacer2.classList.add("spacer");
+  // Spacers
+  const spacers = [];
+  for (let i = 0; i < 4; i++) {
+    const spacer = document.createElement("div");
+    spacer.classList.add("spacer");
+    spacers.push(spacer);
+  }
+
+  // Access the spacers using their index
+  const spacer1 = spacers[0];
+  const spacer2 = spacers[1];
+  const spacer3 = spacers[2];
+  const spacer4 = spacers[3];
 
   currentArray.forEach((result, index) => {
     // Card Container
@@ -104,6 +130,9 @@ function createDOMNodes(page) {
     link.appendChild(image);
     card.appendChild(link);
 
+    // Check if currentArray only has favorited items
+    const isFavoritesOnly = currentArray.every((item) => favorites[item.url]);
+
     if (index < 3 && page === "results") {
       // Card Title
       cardTitle.classList.add("card-title");
@@ -111,7 +140,11 @@ function createDOMNodes(page) {
       card.appendChild(cardTitle);
 
       // Append the card to the block-three-container
-      blockThreeContainer.appendChild(card);
+      blockThreeContainer.appendChild(spacer1);
+      blockThreeContainer.appendChild(imagesBlockContainer);
+      blockThreeContainer.appendChild(spacer2);
+      imagesContainer.appendChild(blockThreeContainer);
+      // blockThreeContainer.appendChild(card);
       imagesBlockContainer.appendChild(card);
       if (index === 1) {
         card.setAttribute("id", "middle-block");
@@ -194,28 +227,33 @@ function createDOMNodes(page) {
         cardTitle.classList.add("card-title-block");
         // Append
         card.appendChild(cardTitle);
-        newBlockThreeContainer.appendChild(spacer1);
+        newBlockThreeContainer.appendChild(spacer3);
         newBlockThreeContainer.appendChild(newImagesBlockContainer);
-        newBlockThreeContainer.appendChild(spacer2);
+        newBlockThreeContainer.appendChild(spacer4);
         imagesContainer.appendChild(newBlockThreeContainer);
         newImagesBlockContainer.appendChild(card);
 
         if (index === 7) {
           card.setAttribute("id", "middle-block");
         }
-      } else {
+      } else if (isFavoritesOnly || index === 5) {
         // Card Body
         const cardBody = document.createElement("div");
         cardBody.classList.add("card-body");
         // Save Text
         const saveText = document.createElement("p");
-        saveText.classList.add("clickable");
-        if (page === "results") {
-          saveText.textContent = "Add To Favorites";
-          saveText.setAttribute("onclick", `saveFavorite('${result.url}')`);
-        } else {
+        saveText.classList.add("clickable", "favorites");
+        // Favorites
+        const isFavorite = favorites[result.url] ? true : false;
+        if (isFavorite) {
           saveText.textContent = "Remove Favorite";
-          saveText.setAttribute("onclick", `removeFavorite('${result.url}')`);
+          saveText.setAttribute("onclick", `toggleFavorite('${result.url}')`);
+        } else {
+          saveText.textContent = "Add To Favorites";
+          saveText.setAttribute(
+            "onclick",
+            `toggleFavorite('${result.url}', this)`
+          );
         }
         // Card Text
         const cardText = document.createElement("p");
@@ -269,7 +307,10 @@ async function getNasaPictures() {
         return (
           !result.url.includes("youtube.com") &&
           !result.url.includes("youtu.be") &&
-          !result.url.includes("player.vimeo.com")
+          !result.url.includes("player.vimeo.com") &&
+          (result.url.endsWith(".jpg") ||
+            result.url.endsWith(".jpeg") ||
+            result.url.endsWith(".png"))
         );
       });
       // Add the valid results to the resultsArray
@@ -284,7 +325,7 @@ async function getNasaPictures() {
 }
 
 // Add result to Favorites
-function saveFavorite(itemUrl) {
+function saveFavorite(itemUrl, element) {
   // Loop through Results Array to select Favorite
   resultsArray.forEach((item) => {
     if (item.url.includes(itemUrl) && !favorites[itemUrl]) {
@@ -296,17 +337,35 @@ function saveFavorite(itemUrl) {
       }, 2000);
       // Set Favorites in localStorage
       localStorage.setItem("nasaFavorites", JSON.stringify(favorites));
+      element.textContent = "Remove Favorite";
+      element.setAttribute("onclick", `toggleFavorite('${itemUrl}', this)`);
     }
   });
 }
 
 //Remove item from Favorites
-function removeFavorite(itemUrl) {
+function removeFavorite(itemUrl, element) {
   if (favorites[itemUrl]) {
     delete favorites[itemUrl];
     // Set Favorites in localStorage
     localStorage.setItem("nasaFavorites", JSON.stringify(favorites));
-    updateDOM("favorites");
+    if (element) {
+      element.textContent = "Add To Favorites";
+      element.setAttribute("onclick", `toggleFavorite('${itemUrl}', this)`);
+    }
+    // Only update the DOM if we are on the favorites page
+    if (!favoritesNav.classList.contains("hidden")) {
+      updateDOM("favorites");
+    }
+  }
+}
+
+// Toggle Favorites
+function toggleFavorite(itemUrl, element) {
+  if (favorites[itemUrl]) {
+    removeFavorite(itemUrl, element);
+  } else {
+    saveFavorite(itemUrl, element);
   }
 }
 
