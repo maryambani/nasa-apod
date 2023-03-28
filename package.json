@@ -1,0 +1,28 @@
+{
+  "name": "nasa-apod",
+  "version": "1.0.0",
+  "description": "This project is a generative blog that pulls data from NASA's Astronomy Picture of the Day (APOD) API to dynamically generate blog posts. There is also a Favorites feature to save any articles of your liking.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-css": "node-sass --include-path scss public/index.scss public/index.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maryambani/nasa-apod.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maryambani/nasa-apod/issues"
+  },
+  "homepage": "https://github.com/maryambani/nasa-apod#readme",
+  "dependencies": {
+    "axios": "^1.3.4",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "node-sass": "^8.0.0"
+  }
+}
