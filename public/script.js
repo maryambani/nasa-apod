@@ -305,7 +305,7 @@ async function getNasaPictures() {
   // Keep fetching until there's 10 URLs with a valid image source
   while (resultsArray.length < count) {
     try {
-      const response = await fetch("/api/getImages");
+      const response = await fetch("/functions/getImages.js");
       const data = await response.json();
       // Filter out blogs with youtube or vimeo links as their image source
       const validResults = data.filter((result) => {
